@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JSON YAML XML Key Viewer</title>
+  <meta name="description" content="View complete JSON, YAML and XML configuration key paths in IntelliJ IDEA and VS Code.">
+
+  <style>
+    :root {
+      --paper: #f4f4f1;
+      --ink: #25282b;
+      --muted: #667078;
+      --line: #d7d9d8;
+      --blue: #2d5d7b;
+      --blue-dark: #204963;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(45, 93, 123, .035) 1px, transparent 1px),
+        linear-gradient(rgba(45, 93, 123, .035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .page {
+      width: min(1080px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--line);
+      font-family: Arial, sans-serif;
+      font-size: .88rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      padding: 4px;
+      display: grid;
+      place-items: center;
+      background: var(--white);
+      border: 1px solid var(--line);
+    }
+
+    header a {
+      color: var(--blue-dark);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 56px;
+      align-items: center;
+      padding: 92px 0 72px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .logo-card {
+      width: 180px;
+      height: 180px;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      box-shadow: 10px 10px 0 rgba(45, 93, 123, .12);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--blue);
+      font: 700 .78rem/1 Arial, sans-serif;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 { margin: 0; }
+
+    h1 {
+      max-width: 760px;
+      font-size: clamp(2.6rem, 7vw, 5.4rem);
+      line-height: .98;
+      letter-spacing: -.055em;
+    }
+
+    .lead {
+      max-width: 680px;
+      margin: 24px 0 30px;
+      color: #4f575d;
+      font-size: 1.3rem;
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-family: Arial, sans-serif;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 13px 17px;
+      color: var(--white);
+      background: var(--blue);
+      border: 1px solid var(--blue);
+      text-decoration: none;
+      font-size: .92rem;
+      font-weight: 700;
+      transition: background .15s ease, transform .15s ease;
+    }
+
+    .button:hover {
+      background: var(--blue-dark);
+      transform: translateY(-2px);
+    }
+
+    .button.secondary {
+      color: var(--blue-dark);
+      background: var(--white);
+      border-color: var(--line);
+    }
+
+    .button.secondary:hover {
+      color: var(--white);
+      background: var(--blue-dark);
+      border-color: var(--blue-dark);
+    }
+
+    .section {
+      padding: 72px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    h2 {
+      font-size: 2rem;
+      letter-spacing: -.035em;
+    }
+
+    .section-heading p {
+      max-width: 650px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.55;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+    }
+
+    .feature {
+      min-height: 180px;
+      padding: 26px;
+      background: rgba(255,255,255,.68);
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .feature-number {
+      display: block;
+      margin-bottom: 28px;
+      color: var(--blue);
+      font: 700 .78rem Arial, sans-serif;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 1.25rem;
+    }
+
+    .feature p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .formats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .format {
+      padding: 13px 17px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      font: 700 .9rem Arial, sans-serif;
+      letter-spacing: .04em;
+    }
+
+    .install {
+      padding: 38px;
+      background: var(--blue-dark);
+      color: var(--white);
+    }
+
+    .install h2 { margin-bottom: 14px; }
+
+    .install p {
+      max-width: 670px;
+      margin: 0 0 24px;
+      color: rgba(255,255,255,.82);
+      font-size: 1.08rem;
+      line-height: 1.55;
+    }
+
+    .install .button {
+      color: var(--blue-dark);
+      background: var(--white);
+      border-color: var(--white);
+    }
+
+    footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 28px 0 42px;
+      color: var(--muted);
+      font: .85rem Arial, sans-serif;
+    }
+
+    footer a {
+      color: var(--blue-dark);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    @media (max-width: 720px) {
+      .hero,
+      .section-heading {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+
+      .hero { padding: 60px 0; }
+
+      .logo-card {
+        width: 128px;
+        height: 128px;
+      }
+
+      .feature-grid { grid-template-columns: 1fr; }
+
+      header { align-items: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header>
+      <div class="brand">
+        <span class="brand-mark">
+          <svg viewBox="0 0 40 40" width="20" height="20" aria-hidden="true">
+            <g transform="translate(2 5.825) scale(.225)" fill="#2C3034">
+              <path d="M83.44 104.26C85.78 93.42 88.1 82.92 89.94 72.34c1.3-7.41 3.88-13.92 10.4-19.51-2.59-.33-4.72-.59-6.9-.87 7.7-4.34 19.77-3.19 29.24 2.73 1.79-8.94-4.99-16.63-13.3-15.1-.27-8.12-8.6-14.21-21.94-15.63-21.27-2.27-39.6 12.3-44.8 33.81-.02.09-.29.12-1.32.51-.1-1.65-.56-3.18-.22-4.49 5.29-20.37 21.33-35.64 44.08-34.72 8.7.36 17.2 2.83 22.73 9.77 3.55 4.46 7.47 7.66 12.12 10.74 7.8 5.16 8.62 14.67 2.67 21.56-1.99-6.01-6.94-7.94-14.41-5.63-6.57 2.03-10.07 7.49-7.85 13.29 1.71 4.46 4.39 8.54 6.52 12.85 4.52 9.19 3.8 18.37-2.06 24.69-1.31 1.41-3.25 2.22-5.37 2.84 4.52-6.36 7.38-13.07 4.81-20.5-2.26-6.54-5.73-12.67-8.67-18.98l-1.23.32c-.62 7.48-.7 15.05-2.01 22.4-1.33 7.39-3.79 14.61-12.87 18.64 1.66-2.93 2.66-4.71 3.88-6.8Z"/>
+              <path d="M31.96 90.97c-.01 2 .06 3.5-.02 4.99-.35 7.22.8 13.59 10.46 15.7-10.36 3.14-16.75-.28-17.56-9.1-.84-9.07-.54-18.25-.67-27.39-.08-6.27-2.32-10.96-10.46-13.01 10.53-3.11 10.65-10.64 10.52-18.37-.09-5.98-.04-11.97 0-17.96.07-9.89 6.58-14.72 16.54-12.29-.02.32.05.88-.08.92-7.32 2.67-9.07 8.27-8.63 15.44.37 5.96-.04 11.97.11 17.96.13 5.71-1.54 10.45-7.05 13.95 7.86 5 6.89 12.73 6.84 20.18-.01 2.83 0 5.66 0 8.49Z"/>
+              <path d="M129.82 107.63c.92-3.17 2.09-6 2.21-8.88.3-6.97.12-13.97.11-20.96-.02-6.38 1.03-12.31 7.11-16.25-5.73-2.92-7.21-7.82-7.26-13.43-.05-5.49-.05-10.98-.03-16.47.01-7.38.37-14.91-9.78-17.52 10.03-3.39 17.35 1.9 17.67 11.79.23 6.82.33 13.66.04 20.47-.29 6.99 1.73 12.37 9.07 15.1-6.88 2.72-9.18 7.73-9.07 14.36.13 7.82.25 15.66-.07 23.46-.43 10.53-7.42 15.76-16.8 12.7 2.28-1.41 4.43-2.73 6.8-4.37Z"/>
+              <path d="M60.75 65.8c-2.76 11.88-5.24 23.47-7.99 36.32-.4-5.07-1.62-9.32-.84-13.16 1.57-7.74 4.13-15.29 6.5-22.85.62-2 .97-1.89 2.33-.31Z"/>
+              <path d="M64.87 82.96c2.09-4.45 4.08-8.52 6.06-12.59.49.22.97.44 1.45.65-4.01 11.4-5.46 23.69-11.8 34.27-.58-.18-1.17-.36-1.76-.53 1.98-7.15 3.96-14.29 6.05-21.8Z"/>
+              <path d="M80.84 85.7c-2.84 7.09-5.33 13.92-8.52 20.39-1.14 2.3-4.01 3.75-6.38 4.93 5.07-10.29 10.14-20.58 14.97-30.37 0 1.07 0 2.86-.07 5.05Z"/>
+              <path d="M47.97 75.92c-.48 4.1-.91 7.76-1.33 11.33-3.27-9.32.36-28.49 5.74-31.84-1.41 6.48-2.88 13.28-4.41 20.51Z"/>
+              <path d="M84.27 35.92c.55-.62 1.12-1.8 1.65-1.78 4.68.2 9.34.6 15.48 1.05-2.23 3.36-3.49 5.26-5.02 7.16-.25-.01-.58-.27-.45-.62.34-1.11.55-1.88 1.03-3.65-3.3 2.35-6.04 4.32-6.22-1.43-2.13-.52-4.3-.62-6.47-.73Z"/>
+              <path d="M83.96 35.93c2.48.1 4.65.2 6.47.86-.43 1.97-.83 4.52-.53 4.6 1.88.53 3.92.52 5.9.69 0 0 .33.26.23.44-1.81.86-3.97 2.52-5.11 1.98-2.16-1-3.72-3.27-5.53-5.01.3-.38.6-.75.9-1.12-1.89-.27-3.78-.55-5.67-.82-.03-.26-.05-.52-.08-.78 1.03-.28 2.07-.55 3.42-.84Z"/>
+            </g>
+          </svg>
+        </span>
+        Documentation First
+      </div>
+
+      <a href="https://github.com/jsonkeyviewer/plugin-intellij">View source ↗</a>
+    </header>
+
+    <section class="hero">
+      <div class="logo-card" aria-label="JSON YAML XML Key Viewer logo">
+        <svg viewBox="0 0 40 40" width="142" height="142" role="img" aria-label="JSON YAML XML Key Viewer">
+          <g transform="translate(2 5.825) scale(.225)" fill="#2C3034">
+            <path d="M83.44 104.26C85.78 93.42 88.1 82.92 89.94 72.34c1.3-7.41 3.88-13.92 10.4-19.51-2.59-.33-4.72-.59-6.9-.87 7.7-4.34 19.77-3.19 29.24 2.73 1.79-8.94-4.99-16.63-13.3-15.1-.27-8.12-8.6-14.21-21.94-15.63-21.27-2.27-39.6 12.3-44.8 33.81-.02.09-.29.12-1.32.51-.1-1.65-.56-3.18-.22-4.49 5.29-20.37 21.33-35.64 44.08-34.72 8.7.36 17.2 2.83 22.73 9.77 3.55 4.46 7.47 7.66 12.12 10.74 7.8 5.16 8.62 14.67 2.67 21.56-1.99-6.01-6.94-7.94-14.41-5.63-6.57 2.03-10.07 7.49-7.85 13.29 1.71 4.46 4.39 8.54 6.52 12.85 4.52 9.19 3.8 18.37-2.06 24.69-1.31 1.41-3.25 2.22-5.37 2.84 4.52-6.36 7.38-13.07 4.81-20.5-2.26-6.54-5.73-12.67-8.67-18.98l-1.23.32c-.62 7.48-.7 15.05-2.01 22.4-1.33 7.39-3.79 14.61-12.87 18.64 1.66-2.93 2.66-4.71 3.88-6.8Z"/>
+            <path d="M31.96 90.97c-.01 2 .06 3.5-.02 4.99-.35 7.22.8 13.59 10.46 15.7-10.36 3.14-16.75-.28-17.56-9.1-.84-9.07-.54-18.25-.67-27.39-.08-6.27-2.32-10.96-10.46-13.01 10.53-3.11 10.65-10.64 10.52-18.37-.09-5.98-.04-11.97 0-17.96.07-9.89 6.58-14.72 16.54-12.29-.02.32.05.88-.08.92-7.32 2.67-9.07 8.27-8.63 15.44.37 5.96-.04 11.97.11 17.96.13 5.71-1.54 10.45-7.05 13.95 7.86 5 6.89 12.73 6.84 20.18-.01 2.83 0 5.66 0 8.49Z"/>
+            <path d="M129.82 107.63c.92-3.17 2.09-6 2.21-8.88.3-6.97.12-13.97.11-20.96-.02-6.38 1.03-12.31 7.11-16.25-5.73-2.92-7.21-7.82-7.26-13.43-.05-5.49-.05-10.98-.03-16.47.01-7.38.37-14.91-9.78-17.52 10.03-3.39 17.35 1.9 17.67 11.79.23 6.82.33 13.66.04 20.47-.29 6.99 1.73 12.37 9.07 15.1-6.88 2.72-9.18 7.73-9.07 14.36.13 7.82.25 15.66-.07 23.46-.43 10.53-7.42 15.76-16.8 12.7 2.28-1.41 4.43-2.73 6.8-4.37Z"/>
+            <path d="M60.75 65.8c-2.76 11.88-5.24 23.47-7.99 36.32-.4-5.07-1.62-9.32-.84-13.16 1.57-7.74 4.13-15.29 6.5-22.85.62-2 .97-1.89 2.33-.31Z"/>
+            <path d="M64.87 82.96c2.09-4.45 4.08-8.52 6.06-12.59.49.22.97.44 1.45.65-4.01 11.4-5.46 23.69-11.8 34.27-.58-.18-1.17-.36-1.76-.53 1.98-7.15 3.96-14.29 6.05-21.8Z"/>
+            <path d="M80.84 85.7c-2.84 7.09-5.33 13.92-8.52 20.39-1.14 2.3-4.01 3.75-6.38 4.93 5.07-10.29 10.14-20.58 14.97-30.37 0 1.07 0 2.86-.07 5.05Z"/>
+            <path d="M47.97 75.92c-.48 4.1-.91 7.76-1.33 11.33-3.27-9.32.36-28.49 5.74-31.84-1.41 6.48-2.88 13.28-4.41 20.51Z"/>
+            <path d="M84.27 35.92c.55-.62 1.12-1.8 1.65-1.78 4.68.2 9.34.6 15.48 1.05-2.23 3.36-3.49 5.26-5.02 7.16-.25-.01-.58-.27-.45-.62.34-1.11.55-1.88 1.03-3.65-3.3 2.35-6.04 4.32-6.22-1.43-2.13-.52-4.3-.62-6.47-.73Z"/>
+            <path d="M83.96 35.93c2.48.1 4.65.2 6.47.86-.43 1.97-.83 4.52-.53 4.6 1.88.53 3.92.52 5.9.69 0 0 .33.26.23.44-1.81.86-3.97 2.52-5.11 1.98-2.16-1-3.72-3.27-5.53-5.01.3-.38.6-.75.9-1.12-1.89-.27-3.78-.55-5.67-.82-.03-.26-.05-.52-.08-.78 1.03-.28 2.07-.55 3.42-.84Z"/>
+          </g>
+        </svg>
+      </div>
+
+      <div>
+        <p class="eyebrow">Configuration paths, made visible</p>
+        <h1>JSON YAML XML<br>Key Viewer</h1>
+        <p class="lead">
+          See the complete path of any configuration key while you work.
+          Available for IntelliJ IDEA and Visual Studio Code.
+        </p>
+
+        <div class="actions">
+          <a class="button" href="https://plugins.jetbrains.com/plugin/34822-json-yaml-xml-key-viewer">
+            JetBrains Marketplace ↗
+          </a>
+          <a class="button secondary" href="https://marketplace.visualstudio.com/items?itemName=DocumentationFirst.json-yaml-xml-key-viewer">
+            VS Code Marketplace ↗
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <h2>Clear paths.<br>Less guessing.</h2>
+        <p>
+          Inspect nested configuration without manually tracing objects, arrays,
+          mappings or XML tags. The path stays close to the key you are editing.
+        </p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature">
+          <span class="feature-number">01</span>
+          <h3>Quick Documentation</h3>
+          <p>Use Ctrl+Q or hover to view a key’s complete dot-notation path and optional value type.</p>
+        </article>
+
+        <article class="feature">
+          <span class="feature-number">02</span>
+          <h3>Gutter markers</h3>
+          <p>Hover or click a marker to reveal the path for a key directly from the editor margin.</p>
+        </article>
+
+        <article class="feature">
+          <span class="feature-number">03</span>
+          <h3>Dense files</h3>
+          <p>Long minified lines collapse into one marker with an explicit Reformat Code action.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <h2>Built for structured configuration.</h2>
+        <p>Nested objects, arrays, repeated XML siblings and keys containing literal dots are resolved into unambiguous paths.</p>
+      </div>
+
+      <div class="formats">
+        <span class="format">JSON</span>
+        <span class="format">YAML</span>
+        <span class="format">XML</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="install">
+        <h2>Install the plugin</h2>
+        <p>Choose your editor, install the extension, then open a JSON, YAML or XML configuration file.</p>
+        <div class="actions">
+          <a class="button" href="https://plugins.jetbrains.com/plugin/34822-json-yaml-xml-key-viewer">
+            Install for IntelliJ IDEA ↗
+          </a>
+          <a class="button" href="https://marketplace.visualstudio.com/items?itemName=DocumentationFirst.json-yaml-xml-key-viewer">
+            Install for VS Code ↗
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>© 2026 Documentation First · Apache-2.0</span>
+      <span>
+        <a href="https://github.com/jsonkeyviewer/plugin-intellij">GitHub</a>
+        ·
+        <a href="https://documentationfirst.ai">Documentation First</a>
+      </span>
+    </footer>
+  </main>
+</body>
+</html>
