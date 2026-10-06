@@ -262,6 +262,14 @@
       font-weight: 700;
     }
 
+    .example-image {
+      display: block;
+      width: 100%;
+      margin-top: 32px;
+      border: 1px solid var(--line);
+      box-shadow: 10px 10px 0 rgba(45, 93, 123, .12);
+    }
+
     @media (max-width: 720px) {
       .hero,
       .section-heading {
@@ -351,9 +359,18 @@
           Inspect nested configuration without manually tracing objects, arrays,
           mappings or XML tags. The path stays close to the key you are editing.
         </p>
+        <h2>See it in the editor.</h2>
+        <p>
+          Hover a key, open Quick Documentation, or use a gutter marker to reveal
+          its complete configuration path.
+        </p>
       </div>
-
-      <img src="exemple.png"></img>
+    
+      <img
+        class="example-image"
+        src="exemple.png"
+        alt="JSON YAML XML Key Viewer showing configuration-key paths in the editor"
+      >
 
       <div class="feature-grid">
         <article class="feature">
